@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ของขวัญสุดพิเศษ!!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <style>
+        :root { --primary-pink: #ff8fa3; --dark-bg: #120508; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Prompt', sans-serif; }
+        body { overflow: hidden; background-color: var(--dark-bg); width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; }
+        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #2a0a10 0%, #120508 100%); z-index: -2; }
+        #particle-field { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .flower-container { position: relative; z-index: 10; cursor: pointer; animation: float 4s ease-in-out infinite; }
+        .flower-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 220px; background: rgba(255, 143, 163, 0.35); filter: blur(40px); border-radius: 50%; z-index: 0; transition: opacity 0.5s ease; }
+        .flower-wrapper { position: relative; z-index: 1; transition: transform 0.3s ease; }
+        .flower-wrapper:hover { transform: scale(1.05); }
+        .flower-img { width: 280px; transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1); }
+        .flower-img.half-left { position: relative; clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+        .flower-img.half-right { position: absolute; top: 0; left: 0; clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); }
+        .flower-wrapper.open .half-left { transform: translateX(-160px) rotate(-25deg) scale(0.7); opacity: 0; }
+        .flower-wrapper.open .half-right { transform: translateX(160px) rotate(25deg) scale(0.7); opacity: 0; }
+        .flower-container.open .flower-glow { opacity: 0; }
+        .message-frame { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: all 0.8s ease; transform: scale(0.9) translateY(20px); }
+        .message-frame.show { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0); }
+        .glass-panel { background: rgba(30, 10, 15, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 143, 163, 0.2); border-radius: 40px; padding: 50px 30px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
+        .title { font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #fff; margin-bottom: 20px; text-shadow: 0 0 15px var(--primary-pink); }
+        .message-text { font-size: 1.1rem; line-height: 1.8; color: rgba(255, 255, 255, 0.9); white-space: pre-wrap; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(2deg); } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer"></div>
+    <div id="particle-field"></div>
+
+    <div class="flower-container" id="flowerOpener">
+        <div class="flower-glow"></div>
+        <div class="flower-wrapper" id="flowerSplitter">
+            <img src="flower.png" alt="Flower Half" class="flower-img half-left">
+            <img src="flower.png" alt="Flower Half" class="flower-img half-right">
+        </div>
+    </div>
+
+    <div class="message-frame" id="messageFrame">
+        <div class="glass-panel" id="tiltCard">
+            <h1 class="title" id="dynamicTitle"></h1>
+            <p class="message-text" id="dynamicMessage"></p>
+            
+            <div id="spotifyContainer" style="width: 100%; text-align: center;"></div>
+
+            <button onclick="location.reload()" style="margin-top: 30px; background: none; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: 0.3s;">close (ปิด)</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
+    <script>
+        const flowerOpener = document.getElementById('flowerOpener');
+        const flowerSplitter = document.getElementById('flowerSplitter');
+        const messageFrame = document.getElementById('messageFrame');
+        const dynamicTitle = document.getElementById('dynamicTitle');
+        const dynamicMessage = document.getElementById('dynamicMessage');
+
+        function initContent() {
+            const params = new URLSearchParams(window.location.search);
+            let title = '';
+            let msg = '';
+            const spotifyId = params.get('spotify'); 
+
+            if (params.has('q')) {
+                try {
+                    const decodedJson = LZString.decompressFromEncodedURIComponent(params.get('q'));
+                    const data = JSON.parse(decodedJson);
+                    title = data.t;
+                    msg = data.m;
+                } catch (e) {
+                    console.error("Decoding error:", e);
+                    title = "เกิดข้อผิดพลาด";
+                    msg = "ไม่สามารถอ่านข้อความได้";
+                }
+            } else {
+                title = params.get('title');
+                msg = params.get('msg');
+            }
+            
+            const titleEl = document.getElementById('dynamicTitle');
+            const msgEl = document.getElementById('dynamicMessage');
+            const spotifyContainer = document.getElementById('spotifyContainer'); 
+            
+            if (titleEl) titleEl.innerHTML = title ? title.replace(/\n/g, '<br>') : '';
+            if (msgEl) msgEl.innerHTML = msg ? msg.replace(/\n/g, '<br>') : '';
+
+            if (spotifyId && spotifyContainer) {
+                spotifyContainer.innerHTML = `
+                    <iframe style="border-radius:12px; margin-top: 15px;" 
+                        src="https://open.spotify.com/embed/track/${spotifyId}?utm_source=generator&theme=0" 
+                        width="100%" height="80" frameBorder="0" allowfullscreen="" 
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+                    </iframe>
+                `;
+            }
+        }
+
+        flowerOpener.addEventListener('click', () => {
+            flowerSplitter.classList.add('open');
+            flowerOpener.classList.add('open');
+
+            setTimeout(() => {
+                flowerOpener.classList.add('hidden');
+                messageFrame.classList.add('show');
+                
+                if (window.innerWidth > 768) {
+                    VanillaTilt.init(document.getElementById("tiltCard"), {
+                        max: 10, speed: 400, glare: true, "max-glare": 0.2
+                    });
+                }
+            }, 600); 
+        });
+
+        function createParticles() {
+            const field = document.getElementById('particle-field');
+            for(let i=0; i<30; i++) {
+                const p = document.createElement('div');
+                p.style.cssText = `
+                    position: absolute; width: ${Math.random() * 3}px; height: ${Math.random() * 3}px;
+                    background: white; border-radius: 50%;
+                    left: ${Math.random() * 100}%; top: ${Math.random() * 100}%;
+                    opacity: ${Math.random() * 0.5}; box-shadow: 0 0 10px white;
+                `;
+                field.appendChild(p);
+                p.animate([ { opacity: 0 }, { opacity: 0.5 }, { opacity: 0 } ], {
+                    duration: 3000 + Math.random() * 3000, iterations: Infinity, delay: Math.random() * 5000
+                });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initContent();
+            createParticles();
+        });
+    </script>
+</body>
+</html>

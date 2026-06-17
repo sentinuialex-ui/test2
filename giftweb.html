@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>ของขวัญสุดพิเศษ!!</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+</head>
+<body>
+    <div class="bg-image-layer"></div>
+    <div class="bg-dark-overlay"></div>
+    <div id="floating-hearts-container"></div>
+    <div id="bloom-overlay"></div>
+
+    <div class="gift-container">
+        <div class="gift-wrapper" id="giftWrapper">
+            <div class="gift-glow-bg"></div>
+            <div class="gift-box" id="giftBox">
+                <img src="gift.png" alt="Gift Box" id="giftImage">
+            </div>
+        </div>
+
+        <div class="cute-popup hidden" id="cutePopup">
+            <div class="popup-content">
+                <h2>พร้อมดูหรือยัง ? <span class="material-symbols-rounded inline-icon bounce"></span></h2>
+                <div class="btn-group">
+                    <button class="btn-confirm" id="confirmOpenBtn">
+                        <span class="material-symbols-rounded btn-icon"></span> เปิดเลยยย
+                    </button>
+                    <button class="btn-cancel" id="cancelPopupBtn">
+                        <span class="material-symbols-rounded btn-icon"></span> ขอทำใจก่อนสิ้
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="message-frame hidden" id="messageFrame">
+            <div class="glass-panel" id="tiltCard">
+                <h1 class="title" id="dynamicTitle"></h1>
+                <p class="message-text" id="dynamicMessage"></p>
+                
+                <div id="spotifyContainer" style="width: 100%; text-align: center;"></div>
+
+                <button onclick="location.reload()" style="margin-top: 30px; background: none; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: 0.3s;">close (ปิด)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    <script src="system.js"></script>
+</body>
+</html>
